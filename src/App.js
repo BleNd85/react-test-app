@@ -7,19 +7,30 @@ import PostFilter from "./components/PostFilter";
 import MyModal from "./components/UI/modal/MyModal";
 import MyButton from "./components/UI/button/MyButton";
 import {useSortedAndSearchedPosts} from "./components/hooks/usePosts";
-import axios from "axios";
 import {PostService} from "./API/PostService";
 import Loader from "./components/UI/loader/Loader";
+import UseFetching from "./components/hooks/UseFetching";
+import getPageCount from "./utils/pages";
+import MyPagination from "./components/UI/pagination/MyPagination";
 
 export default function App() {
     const [posts, setPosts] = useState([]);
     const [filter, setFilter] = useState({sort: "", query: ""});
     const [modal, setModal] = useState(false);
+    const [totalPages, setTotalPages] = useState(0);
+    const [limit, setLimit] = useState(10);
+    const [page, setPage] = useState(1);
     const sortedAndSearchedPosts = useSortedAndSearchedPosts(posts, filter.sort, filter.query);
-    const [isPostsLoading, setIsPostsLoading] = useState(false);
+
+    const [fetchPosts, isPostsLoading, postsError] = UseFetching(async (limit, page) => {
+        const response = await PostService.getAllPosts(limit, page);
+        setPosts(response.data);
+        const totalCount = response.headers["x-total-count"]
+        setTotalPages(getPageCount(totalCount, limit));
+    })
 
     useEffect(() => {
-        fetchPosts();
+        fetchPosts(limit, page);
     }, [])
 
     function createPost(newPost) {
@@ -27,15 +38,13 @@ export default function App() {
         setModal(false);
     }
 
-    async function fetchPosts() {
-        setIsPostsLoading(true);
-        const posts = await PostService.getAllPosts();
-        setPosts(posts);
-        setIsPostsLoading(false);
-    }
-
     function removePost(post) {
         setPosts(posts.filter((p) => p.id !== post.id));
+    }
+
+    function changePage(page) {
+        setPage(page);
+        fetchPosts(limit, page);
     }
 
     return (
@@ -48,10 +57,15 @@ export default function App() {
             </MyModal>
             <PostFilter filter={filter} setFilter={setFilter}/>
             <hr style={{marginTop: "1rem", marginBottom: "1rem"}}/>
+            {postsError &&
+                <h1>Error {postsError}</h1>}
             {isPostsLoading
-            ? <Loader/>
-            :<PostList posts={sortedAndSearchedPosts} title={"Title"} remove={removePost}/>}
-
+                ? <Loader/>
+                : <PostList posts={sortedAndSearchedPosts} title={"Title"} remove={removePost}/>}
+            <MyPagination
+                totalPages={totalPages}
+                page={page}
+                changePage={changePage}/>
         </div>
     )
 }

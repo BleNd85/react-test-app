@@ -30,17 +30,43 @@
     transition: all 500ms ease-in-out;
     transform: translateY(10px);
 }
+
 .post-enter-active {
     opacity: 1;
     transition: all 500ms ease-in-out;
     transform: translateY(0);
 }
+
 .post-exit {
     opacity: 1;
     transform: translateY(0);
 }
+
 .post-exit-active {
     opacity: 0;
     transition: all 300ms ease-in-out;
     transform: translateY(-10px);
+}
+
+.page-wrapper {
+    display: flex;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.page{
+    padding: 0.3rem;
+    margin-right: 0.5rem;
+    border-radius: 0.3rem;
+    border: 1px solid #b7905d;
+    cursor: pointer;
+}
+.page:active {
+    box-shadow: 0 0 0.4rem 0.075rem #b7905d;
+}
+
+.page-current{
+    font-weight: bold;
+    border: 1px solid #693500;
+
 }
