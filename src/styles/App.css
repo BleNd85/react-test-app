@@ -7,7 +7,8 @@
 
 #root {
     display: flex;
-    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
 
 .App {
@@ -54,18 +55,19 @@
     margin-bottom: 1rem;
 }
 
-.page{
+.page {
     padding: 0.3rem;
     margin-right: 0.5rem;
     border-radius: 0.3rem;
     border: 1px solid #b7905d;
     cursor: pointer;
 }
+
 .page:active {
     box-shadow: 0 0 0.4rem 0.075rem #b7905d;
 }
 
-.page-current{
+.page-current {
     font-weight: bold;
     border: 1px solid #693500;
 

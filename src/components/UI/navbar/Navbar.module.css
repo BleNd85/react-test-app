@@ -1,0 +1,13 @@
+.navbar {
+    display: flex;
+    align-items: center;
+    height: 4rem;
+    width: 100vw;
+    padding: 1rem;
+    background-color: #b7905d;
+}
+
+.navbar-element {
+    justify-self: center;
+    padding: 1rem;
+}
