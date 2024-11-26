@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import "../styles/App.css"
 import PostList from "../components/PostList";
 import PostForm from "../components/PostForm";
@@ -11,6 +11,8 @@ import Loader from "../components/UI/loader/Loader";
 import UseFetching from "../components/hooks/useFetching";
 import getPageCount from "../utils/pages";
 import MyPagination from "../components/UI/pagination/MyPagination";
+import useObserver from "../components/hooks/useObserver";
+import MySelect from "../components/MySelect";
 
 export default function Posts() {
     const [posts, setPosts] = useState([]);
@@ -20,17 +22,22 @@ export default function Posts() {
     const [limit, setLimit] = useState(10);
     const [page, setPage] = useState(1);
     const sortedAndSearchedPosts = useSortedAndSearchedPosts(posts, filter.sort, filter.query);
+    const lastElement = useRef();
 
     const [fetchPosts, isPostsLoading, postsError] = UseFetching(async (limit, page) => {
         const response = await PostService.getAllPosts(limit, page);
-        setPosts(response.data);
+        setPosts([...posts, ...response.data]);
         const totalCount = response.headers["x-total-count"]
         setTotalPages(getPageCount(totalCount, limit));
     })
 
+    useObserver(lastElement, page < totalPages, isPostsLoading, () => {
+        setPage(page + 1);
+    });
+
     useEffect(() => {
         fetchPosts(limit, page);
-    }, [])
+    }, [page, limit])
 
     function createPost(newPost) {
         setPosts([...posts, newPost]);
@@ -43,7 +50,6 @@ export default function Posts() {
 
     function changePage(page) {
         setPage(page);
-        fetchPosts(limit, page);
     }
 
     return (
@@ -56,11 +62,23 @@ export default function Posts() {
             </MyModal>
             <PostFilter filter={filter} setFilter={setFilter}/>
             <hr style={{marginTop: "1rem", marginBottom: "1rem"}}/>
+            <MySelect
+                value={limit}
+                onChange={limit => setLimit(limit)}
+                defaultValue={"Amount of elements"}
+                options={[
+                    {value: 5, name: "5"},
+                    {value: 10, name: "10"},
+                    {value: 25, name: "25"},
+                    {value: -1, name: "All"}
+                ]}/>
             {postsError &&
                 <h1>Error {postsError}</h1>}
-            {isPostsLoading
-                ? <Loader/>
-                : <PostList posts={sortedAndSearchedPosts} title={"Title"} remove={removePost}/>}
+            {isPostsLoading &&
+                <Loader/>
+            }
+            <PostList posts={sortedAndSearchedPosts} title={"Title"} remove={removePost}/>
+            <div ref={lastElement}></div>
             <MyPagination
                 totalPages={totalPages}
                 page={page}
