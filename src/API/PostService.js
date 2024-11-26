@@ -6,4 +6,7 @@ export class PostService {
             params: {_limit: limit, _page: page}
         });
     }
+    static async getPostById(id) {
+        return await axios.get(`https://jsonplaceholder.typicode.com/posts/${id}`);
+    }
 }

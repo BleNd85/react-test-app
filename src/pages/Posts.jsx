@@ -8,7 +8,7 @@ import MyButton from "../components/UI/button/MyButton";
 import {useSortedAndSearchedPosts} from "../components/hooks/usePosts";
 import {PostService} from "../API/PostService";
 import Loader from "../components/UI/loader/Loader";
-import UseFetching from "../components/hooks/UseFetching";
+import UseFetching from "../components/hooks/useFetching";
 import getPageCount from "../utils/pages";
 import MyPagination from "../components/UI/pagination/MyPagination";
 
